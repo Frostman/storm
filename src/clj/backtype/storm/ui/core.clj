@@ -84,6 +84,11 @@ function toggleSys() {
 
     $.cookies.set('sys', sys, {'path': '/', 'expiresAt': exDate.toUTCString()});
     window.location = window.location;
+}
+function confirmKill(topology) {
+  if (confirm('Do you realy want to kill topology ' + topology + '?')) {
+      window.location.href = '/topology/' + topology + '/kill';
+  }
 }"]
    [:body
     [:h1 (link-to "/" "Storm UI")]
@@ -126,8 +131,9 @@ function toggleSys() {
      (link-to (url-format "/topology/%s" id) content)))
 
 (defn topology-kill-link
-  ([name] (link-to (url-format "/topology/%s/kill" name) "kill")))
-
+  ([name] [:input {:type "button"
+                   :value "Kill"
+                   :onclick (str "confirmKill(" name ")")}]))
 
 (defn main-topology-summary-table [summs]
   ;; make the id clickable

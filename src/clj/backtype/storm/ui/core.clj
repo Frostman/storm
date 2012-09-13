@@ -1,6 +1,8 @@
 (ns backtype.storm.ui.core
   (:use compojure.core)
   (:use [hiccup core page-helpers])
+  (:use [clojure.tools.cli :only [cli]])
+  (:use [backtype.storm thrift config log])
   (:use [backtype.storm config util])
   (:use [backtype.storm.ui helpers])
   (:use [backtype.storm.daemon [common :only [ACKER-COMPONENT-ID system-id?]]])
@@ -11,15 +13,17 @@
             ErrorInfo ClusterSummary SupervisorSummary TopologySummary
             Nimbus$Client StormTopology GlobalStreamId])
   (:import [java.io File])
+  (:import [backtype.storm.generated KillOptions])
   (:require [compojure.route :as route]
             [compojure.handler :as handler]
+            [ring.util.response :as resp]
             [backtype.storm [thrift :as thrift]])
   (:gen-class))
 
 (def ^:dynamic *STORM-CONF* (read-storm-config))
 
 (defmacro with-nimbus [nimbus-sym & body]
-  `(thrift/with-nimbus-connection [~nimbus-sym "localhost" (*STORM-CONF* NIMBUS-THRIFT-PORT)]
+  `(thrift/with-nimbus-connection [~nimbus-sym "anm-dev-1" (*STORM-CONF* NIMBUS-THRIFT-PORT)]
      ~@body
      ))
 
@@ -42,7 +46,7 @@
     (include-js "/js/jquery.tablesorter.min.js")
     (include-js "/js/jquery.cookies.2.2.0.min.js")
     ]
-   [:script "$.tablesorter.addParser({ 
+   [:script "$.tablesorter.addParser({
         id: 'stormtimestr', 
         is: function(s) { 
             return false; 
@@ -121,11 +125,15 @@ function toggleSys() {
   ([id content]
      (link-to (url-format "/topology/%s" id) content)))
 
+(defn topology-kill-link
+  ([name] (link-to (url-format "/topology/%s/kill" name) "kill")))
+
+
 (defn main-topology-summary-table [summs]
   ;; make the id clickable
   ;; make the table sortable
   (sorted-table
-   ["Name" "Id" "Status" "Uptime" "Num workers" "Num executors" "Num tasks"]
+   ["Name" "Id" "Status" "Uptime" "Num workers" "Num executors" "Num tasks" "Actions"]
    (for [^TopologySummary t summs]
      [(topology-link (.get_id t) (.get_name t))
       (.get_id t)
@@ -134,13 +142,14 @@ function toggleSys() {
       (.get_num_workers t)
       (.get_num_executors t)
       (.get_num_tasks t)
+      (topology-kill-link (.get_name t))
       ])
    :time-cols [2]
    :sort-list "[[2,1]]"
    ))
 
 (defn supervisor-summary-table [summs]
-  (sorted-table 
+  (sorted-table
    ["Host" "Uptime" "Slots" "Used slots"]
    (for [^SupervisorSummary s summs]
      [(.get_host s)
@@ -158,7 +167,7 @@ function toggleSys() {
        [[:h2 "Topology summary"]]
        (main-topology-summary-table (.get_topologies summ))
        [[:h2 "Supervisor summary"]]
-       (supervisor-summary-table (.get_supervisors summ))       
+       (supervisor-summary-table (.get_supervisors summ))
        ))))
 
 (defn component-type [^StormTopology topology id]
@@ -255,7 +264,7 @@ function toggleSys() {
         stream-summary (-> stream-summary (dissoc :emitted) (assoc :emitted emitted))
         stream-summary (-> stream-summary (dissoc :transferred) (assoc :transferred transferred))]
     stream-summary))
-    
+
 (defn aggregate-bolt-stats [stats-seq include-sys?]
   (let [stats-seq (collectify stats-seq)]
     (merge (pre-process (aggregate-common-stats stats-seq) include-sys?)
@@ -637,7 +646,7 @@ function toggleSys() {
 
      [[:h2 "Input stats" window-hint]]
      (bolt-input-summary-table stream-summary window)
-     
+
      [[:h2 "Output stats" window-hint]]
      (bolt-output-summary-table stream-summary window)
 
@@ -698,6 +707,11 @@ function toggleSys() {
          (-> (component-page id component (:window m) include-sys?)
              (concat [(mk-system-toggle-button include-sys?)])
              ui-template)))
+  (GET "/topology/:name/kill" [name]
+      (with-configured-nimbus-connection nimbus
+          (.killTopologyWithOpts nimbus name (KillOptions.)))
+      (log-message "Killed topology: " name)
+      (resp/redirect "/"))
   (route/resources "/")
   (route/not-found "Page not found"))
 

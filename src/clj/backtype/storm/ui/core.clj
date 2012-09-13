@@ -23,7 +23,7 @@
 (def ^:dynamic *STORM-CONF* (read-storm-config))
 
 (defmacro with-nimbus [nimbus-sym & body]
-  `(thrift/with-nimbus-connection [~nimbus-sym]
+  `(thrift/with-configured-nimbus-connection [~nimbus-sym]
      ~@body
      ))
 

@@ -133,7 +133,7 @@ function confirmKill(topology) {
 (defn topology-kill-link
   ([name] [:input {:type "button"
                    :value "Kill"
-                   :onclick (str "confirmKill(" name ")")}]))
+                   :onclick (str "confirmKill('" name "')")}]))
 
 (defn main-topology-summary-table [summs]
   ;; make the id clickable

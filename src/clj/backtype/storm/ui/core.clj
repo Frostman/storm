@@ -131,9 +131,10 @@ function confirmKill(topology) {
      (link-to (url-format "/topology/%s" id) content)))
 
 (defn topology-kill-link
-  ([name] [:input {:type "button"
+  ([name status] (if (not (.equals "KILLED" status)))[:input {:type "button"
                    :value "Kill"
-                   :onclick (str "confirmKill('" name "')")}]))
+                   :onclick (str "confirmKill('" name "')")}]
+                    ""))
 
 (defn main-topology-summary-table [summs]
   ;; make the id clickable
@@ -148,7 +149,7 @@ function confirmKill(topology) {
       (.get_num_workers t)
       (.get_num_executors t)
       (.get_num_tasks t)
-      (topology-kill-link (.get_name t))
+      (topology-kill-link (.get_name t) (.get_status t))
       ])
    :time-cols [2]
    :sort-list "[[2,1]]"

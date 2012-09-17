@@ -1,2 +1,2 @@
 language: clojure
-script: "./install-zeromq.sh"
+before_install: "./install_zeromq.sh"

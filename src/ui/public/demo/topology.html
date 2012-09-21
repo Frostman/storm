@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Storm UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        .ts-sidenav {
+            width: 180px;
+            margin: 30px 0 0;
+            padding: 0;
+            background-color: #fff;
+            -webkit-border-radius: 6px;
+            -moz-border-radius: 6px;
+            border-radius: 6px;
+            -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+            -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+        }
+
+        .ts-sidenav > dd {
+            display: block;
+            margin: 0 0 -1px;
+            padding: 8px 14px;
+        }
+
+        .ts-sidenav > dt {
+            margin: 0 1px -1px;
+        }
+
+        .ts-sidenav > li:first-child > a {
+            -webkit-border-radius: 6px 6px 0 0;
+            -moz-border-radius: 6px 6px 0 0;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .ts-sidenav > li:last-child > a {
+            -webkit-border-radius: 0 0 6px 6px;
+            -moz-border-radius: 0 0 6px 6px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .ts-sidenav > .active > a {
+            position: relative;
+            z-index: 2;
+            padding: 9px 15px;
+            border: 0;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, .15);
+            -webkit-box-shadow: inset 1px 0 0 rgba(0, 0, 0, .1), inset -1px 0 0 rgba(0, 0, 0, .1);
+            -moz-box-shadow: inset 1px 0 0 rgba(0, 0, 0, .1), inset -1px 0 0 rgba(0, 0, 0, .1);
+            box-shadow: inset 1px 0 0 rgba(0, 0, 0, .1), inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+
+        .ts-sidenav > li > a:hover {
+            background-color: #f5f5f5;
+        }
+
+        .ts-sidenav.affix {
+            top: 40px;
+        }
+
+        .ts-sidenav.affix-bottom {
+            position: absolute;
+            top: auto;
+            bottom: 270px;
+        }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="favicon.ico">
+</head>
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="index.html">Storm UI</a>
+
+            <div class="nav-collapse collapse">
+                <p class="navbar-text pull-right">
+                    <a href="#">Enable autoupdate</a>
+                </p>
+                <ul class="nav">
+                    <li class="active"><a href="index.html">Home</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span10">
+            <h2>Topology summary</h2>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Id</th>
+                    <th>Status</th>
+                    <th>Uptime</th>
+                    <th>Num workers</th>
+                    <th>Num executors</th>
+                    <th>Num tasks</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>counter-tplg</td>
+                    <td>counter-tplg-2-1348239943</td>
+                    <td><span class="label label-success">ACTIVE</span></td>
+                    <td>4h 59m 7s</td>
+                    <td>5</td>
+                    <td>12</td>
+                    <td>12</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h2>Topology stats</h2>
+            <table class="table table-striped table-hover" id="3e3ac37a-870b-426a-985f-a5b781f22e77">
+                <thead>
+                <tr>
+                    <th>Window</th>
+                    <th>Emitted</th>
+                    <th>Transferred</th>
+                    <th>Complete latency (ms)</th>
+                    <th>Acked</th>
+                    <th>Failed</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><a href="#">10m 0s</a></td>
+                    <td>36643080</td>
+                    <td>36644100</td>
+                    <td>0.000</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><a href="#">3h 0m 0s</a></td>
+                    <td>58229980</td>
+                    <td>58231000</td>
+                    <td>0.000</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><a href="#">1d 0h 0m 0s</a></td>
+                    <td>58229980</td>
+                    <td>58231000</td>
+                    <td>0.000</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><a class="red" href="#">All time</a>
+                    </td>
+                    <td>58229980</td>
+                    <td>58231000</td>
+                    <td>0.000</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h2>Spouts (All time)</h2>
+            <table class="table table-striped table-hover" id="03a536de-ff14-4d5a-b268-8ecf3114647d">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Executors</th>
+                    <th>Tasks</th>
+                    <th>Emitted</th>
+                    <th>Transferred</th>
+                    <th>Complete latency (ms)</th>
+                    <th>Acked</th>
+                    <th>Failed</th>
+                    <th>Last error</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><a href="#">DbFlushSpout</a></td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>260</td>
+                    <td>1300</td>
+                    <td>0.000</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><a href="#">MessageSource</a></td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>58229720</td>
+                    <td>58229700</td>
+                    <td>0.000</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h2>Bolts (All time)</h2>
+            <table class="table table-striped table-hover" id="f7933e7a-7d35-42e6-9733-1e527c1ddecd">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Executors</th>
+                    <th>Tasks</th>
+                    <th>Emitted</th>
+                    <th>Transferred</th>
+                    <th>Process latency (ms)</th>
+                    <th>Acked</th>
+                    <th>Failed</th>
+                    <th>Last error</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <a href="#">MessageAggregator</a>
+                    </td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0.006</td>
+                    <td>57429160</td>
+                    <td>0</td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p>
+                <a class="btn" onclick="toggleSys()">Show System Stats</a>
+            </p>
+        </div>
+
+        <div class="span2 ts-sidebar">
+            <dl class="ts-sidenav">
+                <h4>Cluster summary</h4>
+
+                <dt>Version</dt>
+                <dd>0.8.1</dd>
+
+                <dt>Nimbus uptime</dt>
+                <dd>1d 9h 58m 46s</dd>
+
+                <dt>Supervisors</dt>
+                <dd>4</dd>
+
+                <dt>Used + free slots</dt>
+                <dd>5 + 27 = 32</dd>
+
+                <dt>Executors</dt>
+                <dd>12</dd>
+
+                <dt>Tasks</dt>
+                <dd>12</dd>
+
+                <h4>Topology summary</h4>
+
+                <dt>counter-tplg <span class="label label-success">ACTIVE</span></dt>
+                <dd>4h 36m 25s</dd>
+                <dd>12 task(s)</dd>
+
+                <dt>another-tplg <span class="label label-warning">REBALANCE</span></dt>
+                <dd>4h 36m 25s</dd>
+                <dd>12 task(s)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p>&copy; Twitter Storm 2012</p>
+    </footer>
+
+</div>
+
+<script src="jquery.min.js"></script>
+<script src="bootstrap.min.js"></script>
+<script>
+    $(function () {
+        var $window = $(window);
+
+        $('.ts-sidenav').affix();
+    })
+</script>
+</body>
+</html>

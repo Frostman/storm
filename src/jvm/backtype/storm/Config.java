@@ -194,6 +194,14 @@ public class Config extends HashMap<String, Object> {
     public static String NIMBUS_FILE_COPY_EXPIRATION_SECS = "nimbus.file.copy.expiration.secs";
 
     /**
+     * A custom class that implements ITopologyValidator that is run whenever a
+     * topology is submitted. Can be used to provide business-specific logic for
+     * whether topologies are allowed to run or not.
+     */
+    public static String NIMBUS_TOPOLOGY_VALIDATOR = "nimbus.topology.validator";
+    
+    
+    /**
      * Storm UI binds to this port.
      */
     public static String UI_PORT = "ui.port";
@@ -521,6 +529,12 @@ public class Config extends HashMap<String, Object> {
       * See doc for TOPOLOGY_ERROR_THROTTLE_INTERVAL_SECS
       */
      public static String TOPOLOGY_MAX_ERROR_REPORT_PER_INTERVAL="topology.max.error.report.per.interval";
+
+
+     /**
+      * How often a batch can be emitted in a Trident topology.
+      */
+     public static String TOPOLOGY_TRIDENT_BATCH_EMIT_INTERVAL_MILLIS="topology.trident.batch.emit.interval.millis";
 
     /**
      * Name of the topology. This config is automatically set by Storm when the topology is submitted.

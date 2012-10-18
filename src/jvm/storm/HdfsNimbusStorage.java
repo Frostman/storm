@@ -93,24 +93,12 @@ public class HdfsNimbusStorage implements INimbusStorage {
     }
 
     @Override
-    public void delete(List<String> paths) {
-        for (String path : paths) {
-            delete(path);
-        }
-    }
-
-    @Override
     public void mkdirs(String path) {
         try {
             fs.mkdirs(new Path(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void move(String from, String to) {
-        throw new RuntimeException("move isn't not implemented for hdfs storage");
     }
 
     @Override

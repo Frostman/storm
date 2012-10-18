@@ -1,9 +1,4 @@
-(def lein-version (System/getenv "LEIN_VERSION"))
-(if-not (re-find #"^1\..*$" lein-version)
-  (do (println (str "ERROR: requires Leiningen 1.x but you are using " lein-version))
-    (System/exit 1)))
-
-(defproject storm "0.8.2-wip11"
+(defproject storm "0.8.2-wip11-hdfs"
   :source-path "src/clj"
   :test-path "test/clj"
   :java-source-path "src/jvm"
@@ -33,6 +28,9 @@
                  [com.googlecode.disruptor/disruptor "2.10.1"]
                  [storm/jgrapht "0.8.3"]
                  [com.google.guava/guava "13.0"]
+                 [org.clojure/clojure "1.4.0"]
+                 [org.apache.hadoop/hadoop-client "0.20.2-cdh3u5"
+                  :exclusions [commons-codec/commons-codec]]
                  ]
   :dev-dependencies [
                      [swank-clojure "1.4.0-SNAPSHOT" :exclusions [org.clojure/clojure]]

@@ -26,21 +26,29 @@ import static org.apache.hadoop.thirdparty.guava.common.collect.Collections2.tra
 public class HdfsNimbusStorage implements INimbusStorage {
     private static final Logger LOG = Logger.getLogger(HdfsNimbusStorage.class);
 
+    public static final String NIMBUS_STORAGE_HDFS_DIR = "nimbus.storage.hdfs.dir";
     public static final String NIMBUS_STORAGE_HDFS_PATH = "nimbus.storage.hdfs.path";
     public static final String NIMBUS_STORAGE_HDFS_USER = "nimbus.storage.hdfs.user";
 
     private FileSystem fs;
+    private String dir;
 
     @Override
     public void init(Map conf) {
         try {
             String pathString = (String) conf.get(NIMBUS_STORAGE_HDFS_PATH);
             LOG.info("Using HDFS Nimbus storage: '" + pathString + "'");
+
             String user = (String) conf.get(NIMBUS_STORAGE_HDFS_USER);
             if (!Strings.isNullOrEmpty(user)) {
                 System.setProperty("HADOOP_USER_NAME", user);
             }
             fs = new Path(pathString).getFileSystem(new Configuration());
+
+            String dirString = (String) conf.get(NIMBUS_STORAGE_HDFS_DIR);
+            if (!Strings.isNullOrEmpty(dirString)) {
+                dir = dirString.trim();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -49,7 +57,7 @@ public class HdfsNimbusStorage implements INimbusStorage {
     @Override
     public InputStream open(String path) {
         try {
-            return fs.open(new Path(path));
+            return fs.open(new Path(prependDir(path)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,7 +66,7 @@ public class HdfsNimbusStorage implements INimbusStorage {
     @Override
     public OutputStream create(String path) {
         try {
-            return fs.create(new Path(path));
+            return fs.create(new Path(prependDir(path)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +75,7 @@ public class HdfsNimbusStorage implements INimbusStorage {
     @Override
     public List<String> list(String path) {
         try {
-            FileStatus[] fileStatuses = fs.listStatus(new Path(path));
+            FileStatus[] fileStatuses = fs.listStatus(new Path(prependDir(path)));
             if (fileStatuses == null) {
                 return Collections.emptyList();
             }
@@ -86,7 +94,7 @@ public class HdfsNimbusStorage implements INimbusStorage {
     @Override
     public void delete(String path) {
         try {
-            fs.delete(new Path(path), true);
+            fs.delete(new Path(prependDir(path)), true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -95,7 +103,7 @@ public class HdfsNimbusStorage implements INimbusStorage {
     @Override
     public void mkdirs(String path) {
         try {
-            fs.mkdirs(new Path(path));
+            fs.mkdirs(new Path(prependDir(path)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -104,5 +112,12 @@ public class HdfsNimbusStorage implements INimbusStorage {
     @Override
     public boolean isSupportDistributed() {
         return true;
+    }
+
+    private String prependDir(String path) {
+        if (!dir.endsWith("/") && !path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return dir + path;
     }
 }

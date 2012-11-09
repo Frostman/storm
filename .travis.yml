@@ -1,0 +1,5 @@
+language: clojure
+lein: lein
+script: lein deps, compile, test
+jdk:
+  - oraclejdk6

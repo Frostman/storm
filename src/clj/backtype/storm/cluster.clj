@@ -131,18 +131,23 @@
 (def SUPERVISORS-ROOT "supervisors")
 (def WORKERBEATS-ROOT "workerbeats")
 (def ERRORS-ROOT "errors")
+(def CUSTOMERCONTEXT-ROOT "customercontext")
 
 (def ASSIGNMENTS-SUBTREE (str "/" ASSIGNMENTS-ROOT))
 (def STORMS-SUBTREE (str "/" STORMS-ROOT))
 (def SUPERVISORS-SUBTREE (str "/" SUPERVISORS-ROOT))
 (def WORKERBEATS-SUBTREE (str "/" WORKERBEATS-ROOT))
 (def ERRORS-SUBTREE (str "/" ERRORS-ROOT))
+(def CUSTOMERCONTEXT-SUBTREE (str "/" CUSTOMERCONTEXT-ROOT))
 
 (defn supervisor-path [id]
   (str SUPERVISORS-SUBTREE "/" id))
 
 (defn assignment-path [id]
   (str ASSIGNMENTS-SUBTREE "/" id))
+
+(defn customercontext-path [id]
+  (str CUSTOMERCONTEXT-SUBTREE "/" id))
 
 (defn storm-path [id]
   (str STORMS-SUBTREE "/" id))
@@ -329,6 +334,7 @@
 
       (remove-storm! [this storm-id]
         (delete-node cluster-state (assignment-path storm-id))
+        (delete-node cluster-state (customercontext-path storm-id))
         (remove-storm-base! this storm-id))
 
       (report-error [this storm-id component-id error]                

@@ -13,10 +13,13 @@
             Nimbus$Client StormTopology GlobalStreamId RebalanceOptions
             KillOptions])
   (:import [java.io File])
+  (:import [backtype.storm.utils Utils])
+  (:import [backtype.storm.task CustomerContext])
   (:require [compojure.route :as route]
             [compojure.handler :as handler]
             [ring.util.response :as resp]
             [backtype.storm [thrift :as thrift]])
+  (:require [backtype.storm [zookeeper :as zk]])
   (:gen-class))
 
 (def ^:dynamic *STORM-CONF* (read-storm-config))
@@ -558,7 +561,7 @@
         (nil-to-zero (:failed stats))])
      )))
 
-(defn spout-executor-table [topology-id executors window include-sys?]
+(defn spout-executor-table [topology-id component executors window include-sys?]
   (sorted-table
    ["Id" "Uptime" "Host" "Port" "Emitted" "Transferred"
     "Complete latency (ms)" "Acked" "Failed"]
@@ -570,7 +573,8 @@
                            aggregate-spout-streams
                            swap-map-order
                            (get window)))]]
-     [(pretty-executor-info (.get_executor_info e))
+     [(let [pretty-executor-info (pretty-executor-info (.get_executor_info e))]
+        (link-to (url-format "/topology/%s/component/%s/executor/%s" topology-id component pretty-executor-info) pretty-executor-info))
       (pretty-uptime-sec (.get_uptime_secs e))
       (.get_host e)
       (.get_port e)
@@ -595,7 +599,7 @@
      [[:h2 "Output stats" window-hint]]
      (spout-output-summary-table stream-summary window)
      [[:h2 "Executors" window-hint]]
-     (spout-executor-table (.get_id topology-info) executors window include-sys?)
+     (spout-executor-table (.get_id topology-info) component executors window include-sys?)
      ;; task id, task uptime, stream aggregated stats, last error
      )))
 
@@ -633,7 +637,7 @@
         ])
      )))
 
-(defn bolt-executor-table [topology-id executors window include-sys?]
+(defn bolt-executor-table [topology-id component executors window include-sys?]
   (sorted-table
    ["Id" "Uptime" "Host" "Port" "Emitted" "Transferred" "Capacity (last 10m)"
     "Execute latency (ms)" "Executed" "Process latency (ms)" "Acked" "Failed"]
@@ -645,7 +649,8 @@
                            (aggregate-bolt-streams)
                            swap-map-order
                            (get window)))]]
-     [(pretty-executor-info (.get_executor_info e))
+     [(let [pretty-executor-info (pretty-executor-info (.get_executor_info e))]
+        (link-to (url-format "/topology/%s/component/%s/executor/%s" topology-id component pretty-executor-info) pretty-executor-info))
       (pretty-uptime-sec (.get_uptime_secs e))
       (.get_host e)
       (.get_port e)
@@ -699,7 +704,7 @@
      (bolt-output-summary-table stream-summary window)
 
      [[:h2 "Executors"]]
-     (bolt-executor-table (.get_id topology-info) executors window include-sys?)
+     (bolt-executor-table (.get_id topology-info) component executors window include-sys?)
      )))
 
 (defn errors-table [errors-list]
@@ -736,6 +741,25 @@
         (errors-table (get (.get_errors summ) component))]
        ))))
 
+(defn executor-page [topology-id component executor window include-sys?]
+  (let [conf *STORM-CONF*
+        split-result (clojure.string/split executor #"-")
+        left-part (first split-result)
+        right-part (last split-result)
+        start-taskid (subs left-part 1)
+        end-taskid (subs right-part 0 (- (count right-part) 1))
+        taskids (range (Integer/parseInt start-taskid) (+ (Integer/parseInt end-taskid) 1))]
+        (for [taskid taskids]
+          (let [path (str (conf STORM-ZOOKEEPER-ROOT) "/" CustomerContext/CUSTOMERCONTEXT_ROOT "/" topology-id "/" taskid)
+                zk (zk/mk-client conf (conf STORM-ZOOKEEPER-SERVERS) (conf STORM-ZOOKEEPER-PORT) :auth-conf conf)
+                task-context-data (zk/get-data zk path false)
+                task-context-map (when task-context-data (Utils/deserialize task-context-data))
+                task-context-table-content (concat
+                                             [[:h2 (link-to (url-format "/topology/%s/component/%s" topology-id component) (str "TaskID:" taskid))]]
+                                             (configuration-table task-context-map))]
+            (.close zk)
+            task-context-table-content))))
+
 (defn get-include-sys? [cookies]
   (let [sys? (get cookies "sys")
         sys? (if (or (nil? sys?) (= "false" (:value sys?))) false true)]
@@ -753,6 +777,11 @@
   (GET "/topology/:id/component/:component" [:as {cookies :cookies} id component & m]
        (let [include-sys? (get-include-sys? cookies)]
          (-> (component-page id component (:window m) include-sys?)
+             (concat [(mk-system-toggle-button include-sys?)])
+             ui-template)))
+  (GET "/topology/:id/component/:component/executor/:executor" [:as {cookies :cookies} id component executor & m]
+       (let [include-sys? (get-include-sys? cookies)]
+         (-> (executor-page id component executor (:window m) include-sys?)
              (concat [(mk-system-toggle-button include-sys?)])
              ui-template)))
   (POST "/topology/:id/activate" [id]

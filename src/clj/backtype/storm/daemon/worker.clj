@@ -3,6 +3,7 @@
   (:use [backtype.storm bootstrap])
   (:require [backtype.storm.daemon [executor :as executor]])
   (:import [java.util.concurrent Executors])
+  (:import [backtype.storm.task CustomerContext])
   (:gen-class))
 
 (bootstrap)
@@ -430,4 +431,5 @@
 (defn -main [storm-id assignment-id port-str worker-id]  
   (let [conf (read-storm-config)]
     (validate-distributed-mode! conf)
-    (mk-worker conf nil (java.net.URLDecoder/decode storm-id) assignment-id (Integer/parseInt port-str) worker-id)))
+    (mk-worker conf nil (java.net.URLDecoder/decode storm-id) assignment-id (Integer/parseInt port-str) worker-id)
+    (CustomerContext/start conf)))

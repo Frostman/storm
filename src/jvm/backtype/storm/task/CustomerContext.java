@@ -30,7 +30,7 @@ public class CustomerContext {
 	 * 
 	 */
 	private static final Map<String, ConcurrentHashMap<Integer, Map<String, Object>>> workerContextMap = new ConcurrentHashMap<String, ConcurrentHashMap<Integer, Map<String, Object>>>();
-	public static final String storm_customercontext_folder = "customercontext";
+	public static String CUSTOMERCONTEXT_ROOT = "customercontext";
 	private static Thread monitorThread = null;
 
 	public static void start(@SuppressWarnings("rawtypes") final Map conf) {
@@ -61,7 +61,7 @@ public class CustomerContext {
 								for (Entry<Integer, Map<String, Object>> stormContextEntry : stormContextMap.entrySet()) {
 									Integer taskId = stormContextEntry.getKey();
 									Map<String, Object> taskContextMap = stormContextEntry.getValue();
-									String path = (String) conf.get(Config.STORM_ZOOKEEPER_ROOT) + "/" + storm_customercontext_folder + "/" + stormId
+									String path = (String) conf.get(Config.STORM_ZOOKEEPER_ROOT) + "/" + CUSTOMERCONTEXT_ROOT + "/" + stormId
 											+ "/" + taskId;
 									try {
 										ZKPaths.mkdirs(curatorFramework.getZookeeperClient().getZooKeeper(), path);
